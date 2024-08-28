@@ -1,3 +1,8 @@
+import fs, { unlink, unlinkSync } from 'fs';
+
+fs.writeFileSync('./firstFile.txt', 'hola texto');
+fs.unlinkSync('./firstFile.txt', )
+
 class ProductManager {
     constructor(){
         this.products = []
