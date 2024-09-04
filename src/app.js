@@ -4,54 +4,65 @@ const app = express();
 
 const PORT = process.env.PORT || 8080;
 
-app.listen(PORT,()=>console.log(`Listening on ${PORT}`));
+
+app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
 
 app.use(express.json());
 
-const users = [];
+const products = []; 
+let nextId = 1; 
 
-app.get('/users',(req,res)=>{
-    //¿Cuál sería su intención? : Obtener usuarios
-    res.send({users});
-})
 
-app.post('/users',(req,res)=>{
-    //¿Cuál sería su intención? : Añadir o Crear un usuario
-    const {firstName,lastName,id} = req.body;
-    //Valido el cuerpo de la petición
-    if(!firstName||!lastName){
-        return res.status(400).send({status:"error",error:"Incomplete values"});
+app.get('/products', (req, res) => {
+    res.send({ products });
+});
+
+
+app.post('/products', (req, res) => {
+    const { title, description, code, price, status, stock, category, thumbnails } = req.body;
+
+    
+    if (!title || !description || !code || typeof price !== 'number' || typeof status !== 'boolean' || typeof stock !== 'number' || !Array.isArray(thumbnails) || !category) {
+        return res.status(400).send({ status: "error", error: "Incomplete or invalid values" });
     }
-    const newUser = {
-        id,
-        firstName,
-        lastName
-    }
-    users.push(newUser);
-   // res.send({status:"success",message:"User created", id});
-    res.sendStatus(201); //Created
-})
 
-app.put('/users/:uid',(req,res)=>{
-    //¿Cuál sería su intención? : Actualizar un usuario
-    const {uid} = req.params;
-    const {firstName, lastName} = req.body;
-    const userIndex = users.findIndex(u=>u.id===uid);
-    if(userIndex === -1){
-        return res.status(400).send({status:"error",error:"User doesn't exist"})
-    }
-    users[userIndex] = {...users[userIndex],firstName,lastName};
+    
+    const newProduct = { id: nextId++, title, description, code, price, status, stock, category, thumbnails };
+    products.push(newProduct); 
 
-    res.send({status:"success",message:"User updated"});
-})
+    res.status(201).send(newProduct); 
+});
 
-app.delete('/users/:uid',(req,res)=>{
-    //¿Cuál sería su intención? : Borrar un usuario
-    const {uid} = req.params;
-    const userIndex = users.findIndex(u=>u.id===uid);
-    if(userIndex === -1){
-        return res.status(400).send({status:"error",error:"User doesn't exist"})
+
+app.put('/products/:id', (req, res) => {
+    const { id } = req.params; 
+    const { title, description, code, price, status, stock, category, thumbnails } = req.body;  
+    const productIndex = products.findIndex(p => p.id === parseInt(id)); 
+
+    
+    if (productIndex === -1) {
+        return res.status(404).send({ status: "error", error: "Product doesn't exist" });
     }
-    users.splice(userIndex,1);
-    res.sendStatus(204);
-})
+
+    
+    products[productIndex] = { ...products[productIndex], title, description, code, price, status, stock, category, thumbnails };
+
+    res.send({ status: "success", message: "Product updated" }); 
+});
+
+
+app.delete('/products/:id', (req, res) => {
+    const { id } = req.params;
+    const productIndex = products.findIndex(p => p.id === parseInt(id)); 
+
+
+    if (productIndex === -1) {
+        return res.status(404).send({ status: "error", error: "Product doesn't exist" });
+    }
+
+
+    products.splice(productIndex, 1);
+
+    res.sendStatus(204); 
+});
