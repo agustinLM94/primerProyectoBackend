@@ -26,7 +26,7 @@
         "nombre": "Nike Tiempo ",
         "precio": 144,
         "imagen": "",
-        "descripcion": "Nike Predator Boots",
+        "descripcion": "Nike Tiempo Boots",
         "categoria": {
             "id": "Boots",
             "nombre": "Boots"
